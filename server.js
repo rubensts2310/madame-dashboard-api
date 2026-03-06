@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const { getMetricoolData } = require('./services/metricool');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -186,6 +187,17 @@ app.get('/api/kpis', (req, res) => {
 
 app.post('/api/refresh', (req, res) => {
   res.json({ success: true, message: 'Data refreshed', timestamp: new Date().toISOString() });
+});
+
+// Metricool endpoint
+app.get('/api/metricool', async (req, res) => {
+  try {
+    const data = await getMetricoolData();
+    res.json({ success: true, data, timestamp: new Date().toISOString() });
+  } catch (error) {
+    console.error('Error in Metricool endpoint:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
 app.listen(PORT, () => {
